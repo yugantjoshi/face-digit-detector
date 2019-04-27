@@ -46,8 +46,45 @@ class MiraClassifier:
     datum is a counter from features to values for those features
     representing a vector of values.
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    greatest_weights = util.Counter()
+    greatest_acc = float('-inf')
+
+    for c in Cgrid:
+      # Get current weights
+      current_weight = self.weights.copy()
+      # Suggested to go through max_iterations constant
+      for iteration in range(self.max_iterations):
+        for k,w in enumerate(trainingData):
+          prediction_score = float('-inf')
+          prediction_label = float('-inf')
+
+          # Prediction with weight w
+          for label in self.legalLabels:
+            if w*current_weight[label] > prediction_score:
+              prediction_score = w*current_weight[label]
+              prediction_label = label
+
+          # Check if this matches the true value
+          real_label = trainingLabels[k]
+          if real_label != prediction_label:
+            # Update weight again
+            f_val = w.copy()
+            minimized_tau = min(c, ((current_weight[prediction_label]-current_weight[real_label])*f_val+1.0)/(2.0*(f_val*f_val)))
+            f_val.divideAll(1.0/minimized_tau)
+            current_weight[prediction_label] = current_weight[prediction_label]-f_val
+            current_weight[real_label] = current_weight[real_label]+f_val
+            # check the accuracy of given c
+            guesses = self.classify(validationData)
+            correct = [guesses[i] == validationLabels[i] for i in range(len(validationLabels))].count(True)
+            accuracy = float(float(correct) / len(guesses))
+
+            # update the weights, if accuracy is higher
+            if accuracy > greatest_acc:
+              greatest_acc = accuracy
+              greatest_weights = current_weight
+
+          # set the best weight values
+          self.weights = greatest_weights
 
   def classify(self, data ):
     """
@@ -64,7 +101,7 @@ class MiraClassifier:
       guesses.append(vectors.argMax())
     return guesses
 
-  
+
   def findHighOddsFeatures(self, label1, label2):
     """
     Returns a list of the 100 features with the greatest difference in feature values
