@@ -5,7 +5,7 @@ import mostFrequent
 import naiveBayes
 import perceptron
 import mira
-import minicontest
+#import minicontest
 import samples
 import sys
 import util
@@ -31,6 +31,8 @@ def basicFeatureExtractorDigit(datum):
         features[(x,y)] = 1
       else:
         features[(x,y)] = 0
+
+  #print(features)
   return features
 
 def basicFeatureExtractorFace(datum):
@@ -47,6 +49,9 @@ def basicFeatureExtractorFace(datum):
         features[(x,y)] = 1
       else:
         features[(x,y)] = 0
+
+  #print(features)
+
   return features
 
 def enhancedFeatureExtractorDigit(datum):
@@ -58,13 +63,102 @@ def enhancedFeatureExtractorDigit(datum):
   
   ## DESCRIBE YOUR ENHANCED FEATURES HERE...
   
+"""
   ##
-  """
   features =  basicFeatureExtractorDigit(datum)
 
+  tempx = 0
+  top = 0
+  left = 0
+  right = 0
+  bottom = 0
+  exit = False
+
+  for i in range(DIGIT_DATUM_WIDTH):
+    for j in range(DIGIT_DATUM_HEIGHT):
+      #print(i, j, features[(i, j)])
+      if features[(i, j)] is 1:
+        #print(i, j, features[(i, j)])
+        left = i, j
+        exit = True
+        break
+    if exit:
+      break
+
+  exit = False
+
+  for i in range(DIGIT_DATUM_WIDTH, 0, -1):
+    for j in range(DIGIT_DATUM_HEIGHT):
+      
+      if features[(i, j)] is 1:
+        #print(i, j, features[(i, j)])
+        right = i, j
+        exit = True
+        break
+    if exit:
+      break
+
+  exit = False
+
+  for i in range(DIGIT_DATUM_WIDTH):
+    for j in range(DIGIT_DATUM_HEIGHT):
+      #print(i, j, features[(i, j)])
+      if features[(j, i)] is 1:
+        #print(i, j, features[(j, i)])
+        bottom = j, i
+        exit = True
+        break
+    if exit:
+      break
+
+  exit = False
+
+  for i in range(DIGIT_DATUM_WIDTH, 0, -1):
+    for j in range(DIGIT_DATUM_HEIGHT):
+      #print(i, j, features[(i, j)])
+      if features[(j, i)] is 1:
+        #print(i, j, features[(j, i)])
+        top = j, i
+        exit = True
+        break
+    if exit:
+      break
+
+  #print(top, bottom, left, right)
+
+  contractFeatures = util.Counter()
+
+  for i in range(DIGIT_DATUM_WIDTH):
+    for j in range(DIGIT_DATUM_HEIGHT):
+
+      if (i, j) == left:
+        print("lft")
+        contractFeatures[(i, j)] = 1
+      elif (i, j) == right:
+        print("rit")
+        contractFeatures[(i, j)] = 1
+      elif (j, i) == top:
+        print("top")
+        contractFeatures[(j, i)] = 1
+      elif (j, i) == bottom:
+        print("bot")
+        contractFeatures[(j, i)] = 1
+      else:
+        contractFeatures[(i, j)] = 0
+
+      if ((i >= left[0] and i <= right[0]) and (j <= top[1] and j >= bottom[1])):
+        contractFeatures[(i, j)] = features[(i, j)]
+
+
+  #print(len(contractFeatures))
+  #print(len(features))
+
   "*** YOUR CODE HERE ***"
+
+  #print(contractFeatures)
+  #printImage(contractFeatures)
   
-  return features
+  return contractFeatures#, (left[0] - right[0]), (top[0] - bottom[0])
 
 
 def contestFeatureExtractorDigit(datum):
@@ -102,18 +196,23 @@ def analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
   This code won't be evaluated. It is for your own optional use
   (and you can modify the signature if you want).
   """
-  
+  #for i in range(len(rawTestData)):
+    #print(rawTestData[i])
+    #printImage(basicFeatureExtractorDigit[rawTestData[i]])
+
   # Put any code here...
   # Example of use:
   for i in range(len(guesses)):
       prediction = guesses[i]
+      print(prediction)
       truth = testLabels[i]
+      print(truth)
       if (prediction != truth):
-          print "==================================="
-          print "Mistake on example %d" % i 
-          print "Predicted %d; truth is %d" % (prediction, truth)
-          print "Image: "
-          print rawTestData[i]
+          print ("===================================")
+          print ("Mistake on example %d" % i )
+          print ("Predicted %d; truth is %d" % (prediction, truth))
+          print ("Image: ")
+          print (rawTestData[i])
           break
 
 
@@ -146,9 +245,9 @@ class ImagePrinter:
             x,y = pix
             image.pixels[x][y] = 2
         except:
-            print "new features:", pix
+            print ("new features:", pix)
             continue
-      print image  
+      print (image)  
 
 def default(str):
   return str + ' [Default: %default]'
@@ -174,15 +273,15 @@ def readCommand( argv ):
   args = {}
   
   # Set up variables according to the command line input.
-  print "Doing classification"
-  print "--------------------"
-  print "data:\t\t" + options.data
-  print "classifier:\t\t" + options.classifier
+  print ("Doing classification")
+  print ("--------------------")
+  print ("data:\t\t" + options.data)
+  print ("classifier:\t\t" + options.classifier)
   if not options.classifier == 'minicontest':
-    print "using enhanced features?:\t" + str(options.features)
+    print ("using enhanced features?:\t" + str(options.features))
   else:
-    print "using minicontest feature extractor"
-  print "training set size:\t" + str(options.training)
+    print ("using minicontest feature extractor")
+  print ("training set size:\t" + str(options.training))
   if(options.data=="digits"):
     printImage = ImagePrinter(DIGIT_DATUM_WIDTH, DIGIT_DATUM_HEIGHT).printImage
     if (options.features):
@@ -198,8 +297,8 @@ def readCommand( argv ):
     else:
       featureFunction = basicFeatureExtractorFace      
   else:
-    print "Unknown dataset", options.data
-    print USAGE_STRING
+    print ("Unknown dataset", options.data)
+    print (USAGE_STRING)
     sys.exit(2)
     
   if(options.data=="digits"):
@@ -208,19 +307,19 @@ def readCommand( argv ):
     legalLabels = range(2)
     
   if options.training <= 0:
-    print "Training set size should be a positive integer (you provided: %d)" % options.training
-    print USAGE_STRING
+    print ("Training set size should be a positive integer (you provided: %d)" % options.training)
+    print (USAGE_STRING)
     sys.exit(2)
     
   if options.smoothing <= 0:
-    print "Please provide a positive number for smoothing (you provided: %f)" % options.smoothing
-    print USAGE_STRING
+    print ("Please provide a positive number for smoothing (you provided: %f)" % options.smoothing)
+    print (USAGE_STRING)
     sys.exit(2)
     
   if options.odds:
     if options.label1 not in legalLabels or options.label2 not in legalLabels:
-      print "Didn't provide a legal labels for the odds ratio: (%d,%d)" % (options.label1, options.label2)
-      print USAGE_STRING
+      print ("Didn't provide a legal labels for the odds ratio: (%d,%d)" % (options.label1, options.label2))
+      print (USAGE_STRING)
       sys.exit(2)
 
   if(options.classifier == "mostFrequent"):
@@ -229,24 +328,24 @@ def readCommand( argv ):
     classifier = naiveBayes.NaiveBayesClassifier(legalLabels)
     classifier.setSmoothing(options.smoothing)
     if (options.autotune):
-        print "using automatic tuning for naivebayes"
+        print ("using automatic tuning for naivebayes")
         classifier.automaticTuning = True
     else:
-        print "using smoothing parameter k=%f for naivebayes" %  options.smoothing
+        print ("using smoothing parameter k=%f for naivebayes" %  options.smoothing)
   elif(options.classifier == "perceptron"):
     classifier = perceptron.PerceptronClassifier(legalLabels,options.iterations)
   elif(options.classifier == "mira"):
     classifier = mira.MiraClassifier(legalLabels, options.iterations)
     if (options.autotune):
-        print "using automatic tuning for MIRA"
+        print ("using automatic tuning for MIRA")
         classifier.automaticTuning = True
     else:
-        print "using default C=0.001 for MIRA"
+        print ("using default C=0.001 for MIRA")
   elif(options.classifier == 'minicontest'):
     classifier = minicontest.contestClassifier(legalLabels)
   else:
-    print "Unknown classifier:", options.classifier
-    print USAGE_STRING
+    print ("Unknown classifier:", options.classifier)
+    print (USAGE_STRING)
     
     sys.exit(2)
 
@@ -298,22 +397,22 @@ def runClassifier(args, options):
     
   
   # Extract features
-  print "Extracting features..."
+  print ("Extracting features...")
   trainingData = map(featureFunction, rawTrainingData)
   validationData = map(featureFunction, rawValidationData)
   testData = map(featureFunction, rawTestData)
   
   # Conduct training and testing
-  print "Training..."
+  print ("Training...")
   classifier.train(trainingData, trainingLabels, validationData, validationLabels)
-  print "Validating..."
+  print ("Validating...")
   guesses = classifier.classify(validationData)
   correct = [guesses[i] == validationLabels[i] for i in range(len(validationLabels))].count(True)
-  print str(correct), ("correct out of " + str(len(validationLabels)) + " (%.1f%%).") % (100.0 * correct / len(validationLabels))
-  print "Testing..."
+  print (str(correct), ("correct out of " + str(len(validationLabels)) + " (%.1f%%).") % (100.0 * correct / len(validationLabels)))
+  print ("Testing...")
   guesses = classifier.classify(testData)
   correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True)
-  print str(correct), ("correct out of " + str(len(testLabels)) + " (%.1f%%).") % (100.0 * correct / len(testLabels))
+  print (str(correct), ("correct out of " + str(len(testLabels)) + " (%.1f%%).") % (100.0 * correct / len(testLabels)))
   analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
   
   # do odds ratio computation if specified at command line
@@ -325,7 +424,7 @@ def runClassifier(args, options):
     else:
       string3 = "=== Features for which weight(label %d)-weight(label %d) is biggest ===" % (label1, label2)    
       
-    print string3
+    print (string3)
     printImage(features_odds)
 
 if __name__ == '__main__':

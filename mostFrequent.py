@@ -15,6 +15,7 @@ class MostFrequentClassifier(classificationMethod.ClassificationMethod):
     """
     Find the most common label in the training data.
     """
+
     counter = util.Counter()
     counter.incrementAll(labels, 1)
     self.guess = counter.argMax()

@@ -10,12 +10,14 @@ class PerceptronClassifier:
   (not to a raw samples.Datum).
   """
   def __init__( self, legalLabels, max_iterations):
+    #print(legalLabels)
     self.legalLabels = legalLabels
     self.type = "perceptron"
     self.max_iterations = max_iterations
     self.weights = {}
     for label in legalLabels:
       self.weights[label] = util.Counter() # this is the data-structure you should use
+      #print(self.weights[label])
       
   def train( self, trainingData, trainingLabels, validationData, validationLabels ):
     """
@@ -29,13 +31,21 @@ class PerceptronClassifier:
     (and thus represents a vector a values).
     """
     
-    self.features = trainingData[0].keys() # could be useful later
-    
+    lab = util.Counter()
+
+    print(trainingData)
+
     for iteration in range(self.max_iterations):
-      print "Starting iteration ", iteration, "..."
+      print ("Starting iteration ", iteration, "...")
       for i in range(len(trainingData)):
+        for l in self.legalLabels:
+          #print(trainingData[i])
+          lab[l] = trainingData[i].__mul__(self.weights[l])
+        if not(trainingLabels[i] == lab.argMax()):
+          self.weights[trainingLabels[i]].__radd__(trainingData[i])
+          self.weights[lab.argMax()].__sub__(trainingData[i])
           "*** YOUR CODE HERE ***"
-          util.raiseNotDefined()
+          #util.raiseNotDefined()
     
   def classify(self, data ):
     """
@@ -60,7 +70,7 @@ class PerceptronClassifier:
 
     """
     featuresOdds = []
-
+    featuresWeights = self.weights[label].values()
     "*** YOUR CODE HERE ***"
     util.raiseNotDefined()
 
