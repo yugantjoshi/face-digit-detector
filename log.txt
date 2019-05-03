@@ -1,0 +1,10 @@
+perceptron Time_To_Train: 2.377304  Time_To_Classify: 0.799472 Time_To_Test: 7.996581  Percantage of train used: (10.000000)  Prediction Accuracy on test: 48.500000%  Dataset: digits
+Time_To_Train: 4.855276  Time_To_Classify: 1.600609 Time_To_Test: 8.036340  Percantage of train used: (20.000000)  Prediction Accuracy on test: 61.000000%  Dataset: digits
+Time_To_Train: 7.290278  Time_To_Classify: 2.398353 Time_To_Test: 7.993328  Percantage of train used: (30.000000)  Prediction Accuracy on test: 68.600000%  Dataset: digits
+Time_To_Train: 9.819741  Time_To_Classify: 3.190442 Time_To_Test: 7.979200  Percantage of train used: (40.000000)  Prediction Accuracy on test: 66.500000%  Dataset: digits
+Time_To_Train: 12.285385  Time_To_Classify: 4.066195 Time_To_Test: 7.949980  Percantage of train used: (50.000000)  Prediction Accuracy on test: 69.200000%  Dataset: digits
+Time_To_Train: 14.745546  Time_To_Classify: 4.773206 Time_To_Test: 7.950565  Percantage of train used: (60.000000)  Prediction Accuracy on test: 65.300000%  Dataset: digits
+Time_To_Train: 17.289082  Time_To_Classify: 5.587544 Time_To_Test: 7.990641  Percantage of train used: (70.000000)  Prediction Accuracy on test: 71.800000%  Dataset: digits
+Time_To_Train: 19.948134  Time_To_Classify: 6.372574 Time_To_Test: 7.981633  Percantage of train used: (80.000000)  Prediction Accuracy on test: 70.900000%  Dataset: digits
+Time_To_Train: 22.271218  Time_To_Classify: 7.173654 Time_To_Test: 7.975338  Percantage of train used: (90.000000)  Prediction Accuracy on test: 74.100000%  Dataset: digits
+Time_To_Train: 24.812528  Time_To_Classify: 7.989385 Time_To_Test: 8.004094  Percantage of train used: (100.000000)  Prediction Accuracy on test: 66.500000%  Dataset: digits

@@ -10,7 +10,7 @@ class PerceptronClassifier:
   (not to a raw samples.Datum).
   """
   def __init__( self, legalLabels, max_iterations):
-    #print(legalLabels)
+    print(legalLabels)
     self.legalLabels = legalLabels
     self.type = "perceptron"
     self.max_iterations = max_iterations
@@ -32,8 +32,6 @@ class PerceptronClassifier:
     """
     
     lab = util.Counter()
-
-    print(trainingData)
 
     for iteration in range(self.max_iterations):
       print ("Starting iteration ", iteration, "...")

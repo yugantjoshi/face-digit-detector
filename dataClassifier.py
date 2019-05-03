@@ -9,12 +9,15 @@ import mira
 import samples
 import sys
 import util
+import time
+import random
 
-TEST_SET_SIZE = 100
+TEST_SET_SIZE = 1000
 DIGIT_DATUM_WIDTH=28
 DIGIT_DATUM_HEIGHT=28
 FACE_DATUM_WIDTH=60
 FACE_DATUM_HEIGHT=70
+COUNT = 0
 
 
 def basicFeatureExtractorDigit(datum):
@@ -65,6 +68,7 @@ def enhancedFeatureExtractorDigit(datum):
   
 """
   ##
+
   features =  basicFeatureExtractorDigit(datum)
 
   tempx = 0
@@ -132,19 +136,31 @@ def enhancedFeatureExtractorDigit(datum):
     for j in range(DIGIT_DATUM_HEIGHT):
 
       if (i, j) == left:
-        print("lft")
         contractFeatures[(i, j)] = 1
+        contractFeatures[(i+1, j)] = 1
+        contractFeatures[(i-1, j)] = 1
+        contractFeatures[(i, j+1)] = 1
+        contractFeatures[(i, j-1)] = 1
       elif (i, j) == right:
-        print("rit")
         contractFeatures[(i, j)] = 1
+        contractFeatures[(i+1, j)] = 1
+        contractFeatures[(i-1, j)] = 1
+        contractFeatures[(i, j+1)] = 1
+        contractFeatures[(i, j-1)] = 1
       elif (j, i) == top:
-        print("top")
         contractFeatures[(j, i)] = 1
+        contractFeatures[(j+1, i)] = 1
+        contractFeatures[(j-1, i)] = 1
+        contractFeatures[(j, i+1)] = 1
+        contractFeatures[(j, i-1)] = 1
       elif (j, i) == bottom:
-        print("bot")
         contractFeatures[(j, i)] = 1
-      else:
-        contractFeatures[(i, j)] = 0
+        contractFeatures[(j+1, i)] = 1
+        contractFeatures[(j-1, i)] = 1
+        contractFeatures[(j, i+1)] = 1
+        contractFeatures[(j, i-1)] = 1
+      #else:
+        #contractFeatures[(i, j)] = features[(i, j)]
 
       if ((i >= left[0] and i <= right[0]) and (j <= top[1] and j >= bottom[1])):
         contractFeatures[(i, j)] = features[(i, j)]
@@ -267,10 +283,15 @@ def readCommand( argv ):
   parser.add_option('-k', '--smoothing', help=default("Smoothing parameter (ignored when using --autotune)"), type="float", default=2.0)
   parser.add_option('-a', '--autotune', help=default("Whether to automatically tune hyperparameters"), default=False, action="store_true")
   parser.add_option('-i', '--iterations', help=default("Maximum iterations to run training"), default=3, type="int")
+  parser.add_option('-p', '--percentage', help=default('The percentage of training data to use'), default=100, type="int")
+  parser.add_option('-s', '--setTest', help=default('The size of test data to use'), default=100, type="int")
 
   options, otherjunk = parser.parse_args(argv)
   if len(otherjunk) != 0: raise Exception('Command line input not understood: ' + str(otherjunk))
   args = {}
+
+  global TEST_SET_SIZE
+  TEST_SET_SIZE = options.setTest
   
   # Set up variables according to the command line input.
   print ("Doing classification")
@@ -394,26 +415,71 @@ def runClassifier(args, options):
     validationLabels = samples.loadLabelsFile("digitdata/validationlabels", TEST_SET_SIZE)
     rawTestData = samples.loadDataFile("digitdata/testimages", TEST_SET_SIZE,DIGIT_DATUM_WIDTH,DIGIT_DATUM_HEIGHT)
     testLabels = samples.loadLabelsFile("digitdata/testlabels", TEST_SET_SIZE)
-    
   
+  indexList = []
+  rawTrainingData1 = []
+  trainingLabels1 = []
+  rawValidationData1 = []
+  validationLabels1 = []
+
+  size = int(1000*(float(options.percentage)/100))
+  for i in range(size):
+    randomNum = random.randrange(size)
+    while randomNum in indexList:
+      randomNum = random.randrange(size)
+
+    rawTrainingData1.append(rawTrainingData[randomNum])
+    trainingLabels1.append(trainingLabels[randomNum])
+    rawValidationData1.append(rawValidationData[randomNum])
+    validationLabels1.append(validationLabels[randomNum])
+
+  #rawTrainingData = random.sample(rawTrainingData, k = int(len(rawTrainingData)*(options.percentage/100)))
+  #print(len(rawTrainingData))
+  #trainingLabels = random.sample(trainingLabels, k = int(len(rawTrainingData)*(options.percentage/100)))
+
+  f = open('log.txt', 'a')
+
   # Extract features
   print ("Extracting features...")
-  trainingData = map(featureFunction, rawTrainingData)
-  validationData = map(featureFunction, rawValidationData)
+  trainingData = map(featureFunction, rawTrainingData1)
+  validationData = map(featureFunction, rawValidationData1)
   testData = map(featureFunction, rawTestData)
-  
+
   # Conduct training and testing
   print ("Training...")
-  classifier.train(trainingData, trainingLabels, validationData, validationLabels)
+  start = time.time()
+  classifier.train(trainingData, trainingLabels1, validationData, validationLabels1)
+  end = time.time()
+  print("Time_To_Train:  ", end - start)
+  f.write("Time_To_Train: %f  " %((end - start)))
+
   print ("Validating...")
+  start = time.time()
   guesses = classifier.classify(validationData)
-  correct = [guesses[i] == validationLabels[i] for i in range(len(validationLabels))].count(True)
-  print (str(correct), ("correct out of " + str(len(validationLabels)) + " (%.1f%%).") % (100.0 * correct / len(validationLabels)))
+  end = time.time()
+
+  print("Time_To_Classify:  ", end - start)
+  f.write("Time_To_Classify: %f " % ((end - start)))
+
+  correct = [guesses[i] == validationLabels1[i] for i in range(len(validationLabels1))].count(True)
+  print (str(correct), ("correct out of " + str(len(validationLabels1)) + " (%.1f%%).") % (100.0 * correct / len(validationLabels1)))
+
   print ("Testing...")
+  start = time.time()
   guesses = classifier.classify(testData)
+  end = time.time()
+
+  print("Time_To_Test:  ", end - start)
+  f.write("Time_To_Test: %f " % ((end - start)))
+
   correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True)
   print (str(correct), ("correct out of " + str(len(testLabels)) + " (%.1f%%).") % (100.0 * correct / len(testLabels)))
   analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
+
+  f.write(" Percantage of train used: (%f) " % options.percentage)
+  f.write(" Prediction Accuracy on test: %f%% " % ( 0+ (100.0 * (float(correct) / float(len(testLabels))))))
+  f.write(" Dataset: %s\n" % options.data)
+  f.close()
   
   # do odds ratio computation if specified at command line
   if((options.odds) & (options.classifier != "mostFrequent")):
@@ -426,6 +492,7 @@ def runClassifier(args, options):
       
     print (string3)
     printImage(features_odds)
+
 
 if __name__ == '__main__':
   # Read input
