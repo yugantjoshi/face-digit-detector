@@ -12,7 +12,7 @@ import util
 import time
 import random
 
-TEST_SET_SIZE = 1000
+TEST_SET_SIZE = 150
 DIGIT_DATUM_WIDTH=28
 DIGIT_DATUM_HEIGHT=28
 FACE_DATUM_WIDTH=60
@@ -404,8 +404,8 @@ def runClassifier(args, options):
   if(options.data=="faces"):
     rawTrainingData = samples.loadDataFile("facedata/facedatatrain", numTraining,FACE_DATUM_WIDTH,FACE_DATUM_HEIGHT)
     trainingLabels = samples.loadLabelsFile("facedata/facedatatrainlabels", numTraining)
-    rawValidationData = samples.loadDataFile("facedata/facedatatrain", TEST_SET_SIZE,FACE_DATUM_WIDTH,FACE_DATUM_HEIGHT)
-    validationLabels = samples.loadLabelsFile("facedata/facedatatrainlabels", TEST_SET_SIZE)
+    rawValidationData = samples.loadDataFile("facedata/facedatatrain", numTraining,FACE_DATUM_WIDTH,FACE_DATUM_HEIGHT)
+    validationLabels = samples.loadLabelsFile("facedata/facedatatrainlabels", numTraining)
     rawTestData = samples.loadDataFile("facedata/facedatatest", TEST_SET_SIZE,FACE_DATUM_WIDTH,FACE_DATUM_HEIGHT)
     testLabels = samples.loadLabelsFile("facedata/facedatatestlabels", TEST_SET_SIZE)
   else:
@@ -422,7 +422,7 @@ def runClassifier(args, options):
   rawValidationData1 = []
   validationLabels1 = []
 
-  size = int(1000*(float(options.percentage)/100))
+  size = int(450*(float(options.percentage)/100))
   for i in range(size):
     randomNum = random.randrange(size)
     while randomNum in indexList:
@@ -437,7 +437,7 @@ def runClassifier(args, options):
   #print(len(rawTrainingData))
   #trainingLabels = random.sample(trainingLabels, k = int(len(rawTrainingData)*(options.percentage/100)))
 
-  f = open('log.txt', 'a')
+  f = open('log1.txt', 'a')
 
   # Extract features
   print ("Extracting features...")

@@ -18,7 +18,8 @@ class PerceptronClassifier:
     for label in legalLabels:
       self.weights[label] = util.Counter() # this is the data-structure you should use
       #print(self.weights[label])
-      
+    print(self.weights)
+
   def train( self, trainingData, trainingLabels, validationData, validationLabels ):
     """
     The training loop for the perceptron passes through the training data several
@@ -37,7 +38,6 @@ class PerceptronClassifier:
       print ("Starting iteration ", iteration, "...")
       for i in range(len(trainingData)):
         for l in self.legalLabels:
-          #print(trainingData[i])
           lab[l] = trainingData[i].__mul__(self.weights[l])
         if not(trainingLabels[i] == lab.argMax()):
           self.weights[trainingLabels[i]].__radd__(trainingData[i])
