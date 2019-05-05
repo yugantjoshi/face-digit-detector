@@ -422,7 +422,7 @@ def runClassifier(args, options):
   rawValidationData1 = []
   validationLabels1 = []
 
-  size = int(450*(float(options.percentage)/100))
+  size = int(options.training*(float(options.percentage)/100))
   for i in range(size):
     randomNum = random.randrange(size)
     while randomNum in indexList:
